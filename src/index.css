@@ -2,9 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary-color: rgba(4, 142, 144, 1);
+  --primary-color-light: rgba(246, 252, 251, 1);
+  --secondary-color: rgba(220, 124, 85, 1);
+
+  --neutral-offwhite: rgba(245, 245, 245, 1);
+  --neutral-lightgray: rgba(239, 239, 239, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family: "Poppins", Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--neutral-offwhite);
+}
+
+@layer components {
+  .show-b {
+    border: 1px solid red;
+    * {
+      border: 1px solid blue;
+      * {
+        border: 1px solid green;
+      }
+    }
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+    color: inherit;
+  }
+
+  .home {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 1rem;
+    height: 100vh;
+  }
+
+  .button-1 {
+    @apply bg-[var(--primary-color)] text-white font-bold p-1 px-4 rounded-full;
+  }
+
+  .max-width {
+    @apply max-w-4xl mx-auto;
+  }
 }
