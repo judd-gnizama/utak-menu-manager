@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 
-const FormModal = ({ children }) => {
-  const [show, setShow] = useState(true);
-
+const FormModal = ({ heading, children, show, setShow }) => {
   return (
     <div
       className={`absolute bg-gray-500 bg-opacity-70 w-full h-full z-40 centered-element flex justify-center items-center ${
@@ -11,11 +9,11 @@ const FormModal = ({ children }) => {
       onClick={() => setShow(false)}
     >
       <div
-        className="grid bg-white rounded-lg p-4 max-w-2xl h-full max-h-[75%] overflow-hidden"
+        className="grid grid-rows-[auto_1fr] bg-white rounded-lg p-4 max-w-2xl h-full max-h-[75%] overflow-y-hidden"
         onClick={(e) => e.stopPropagation()} // stop from exiting
       >
-        <FormModalHeader heading="Heading" setShow={setShow} />
-        <div className="overflow-y-scroll">{children}</div>
+        <FormModalHeader heading={heading} setShow={setShow} />
+        <div className=" overflow-auto">{children}</div>
       </div>
     </div>
   );

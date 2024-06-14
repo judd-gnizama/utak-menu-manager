@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Search from "../components/Search";
 import SearchResult from "../components/SearchResult";
-import FormModal from "../components/FormModal";
+import NewItemForm from "../components/NewItemForm";
 
 const Home = () => {
+  const [showAdd, setShowAdd] = useState(false);
+
   return (
     <div className="home">
       <Header />
@@ -15,7 +17,10 @@ const Home = () => {
           <button className="inline-flex items-center gap-1 button-2">
             <span className="material-symbols-outlined">filter_list</span>Filter
           </button>
-          <button className="inline-flex items-center gap-1 button-1">
+          <button
+            className="inline-flex items-center gap-1 button-1"
+            onClick={() => setShowAdd(true)}
+          >
             <span className="material-symbols-outlined">add</span>Add
           </button>
         </section>
@@ -40,7 +45,8 @@ const Home = () => {
         </section>
       </main>
       <Footer />
-      <FormModal></FormModal>
+      {/* Modals */}
+      <NewItemForm show={showAdd} setShow={setShowAdd} />
     </div>
   );
 };
