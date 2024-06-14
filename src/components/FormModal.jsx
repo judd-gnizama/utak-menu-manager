@@ -22,7 +22,7 @@ const FormModal = ({ heading, children, show, setShow }) => {
 const FormModalHeader = ({ heading, setShow }) => {
   return (
     <div className="flex flex-col gap-2 mb-2">
-      <span className="text-lg font-bold relative">
+      <span className="text-xl font-bold relative">
         {heading}
         <button
           type="button"

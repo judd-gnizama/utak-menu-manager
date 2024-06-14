@@ -7,8 +7,8 @@ const addItem = () => {
   const newItemRef = push(ref(db, "/menu/items"));
   set(newItemRef, {
     name: "Fries",
-    priceInCents: 2000,
-    costInCents: 1000,
+    price: 20,
+    cost: 1000,
     stock: 50,
     available: true,
     description: "Deep-fried potato. Not really healthy",
@@ -19,20 +19,20 @@ const addItem = () => {
         variations: [
           {
             var_name: "Small",
-            priceDeltaInCents: 0,
-            costDeltaInCents: 0,
+            priceDelta: 0,
+            costDelta: 0,
             available: true,
           },
           {
             var_name: "Medium",
-            priceDeltaInCents: 500,
-            costDeltaInCents: 200,
+            priceDelta: 500,
+            costDelta: 200,
             available: true,
           },
           {
             var_name: "Large",
-            priceDeltaInCents: 800,
-            costDeltaInCents: 300,
+            priceDelta: 800,
+            costDelta: 300,
             available: true,
           },
         ],
@@ -42,20 +42,20 @@ const addItem = () => {
         variations: [
           {
             var_name: "Pepperoni",
-            priceDeltaInCents: 120,
-            costDeltaInCents: 20,
+            priceDelta: 120,
+            costDelta: 20,
             available: true,
           },
           {
             var_name: "Ham",
-            priceDeltaInCents: 300,
-            costDeltaInCents: 100,
+            priceDelta: 300,
+            costDelta: 100,
             available: true,
           },
           {
             var_name: "Cheese",
-            priceDeltaInCents: 400,
-            costDeltaInCents: 200,
+            priceDelta: 400,
+            costDelta: 200,
             available: true,
           },
         ],

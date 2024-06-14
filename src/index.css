@@ -70,6 +70,10 @@ body {
     @apply bg-inherit text-gray-500 border border-gray-500 p-1 px-4 rounded-full;
   }
 
+  input[type="checkbox"] {
+    accent-color: var(--primary-color);
+  }
+
   .max-width {
     @apply max-w-4xl mx-auto;
   }
