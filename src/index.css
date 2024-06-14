@@ -35,6 +35,10 @@ body {
   }
 
   .material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    color: inherit;
+  }
+  .filled {
     font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
     color: inherit;
   }
@@ -46,8 +50,24 @@ body {
     height: 100vh;
   }
 
+  .section {
+    @apply h-fit bg-white max-width w-full p-4 rounded-lg;
+  }
+
+  .centered-element {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+
   .button-1 {
     @apply bg-[var(--primary-color)] text-white font-bold p-1 px-4 rounded-full;
+  }
+  .button-2 {
+    @apply bg-inherit text-gray-500 border border-gray-500 p-1 px-4 rounded-full;
   }
 
   .max-width {

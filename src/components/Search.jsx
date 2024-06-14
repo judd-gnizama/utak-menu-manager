@@ -9,7 +9,7 @@ const Search = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative">
+    <form onSubmit={handleSubmit} className="flex-1 relative">
       <input
         type="text"
         placeholder="Search..."
