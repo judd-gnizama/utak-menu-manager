@@ -115,6 +115,33 @@ const NewItemForm = ({ show, setShow }) => {
     });
   };
 
+  const handleDeleteVariation = (variationName) => {
+    const existingVariations = itemFormData.var_options;
+    const filtered = existingVariations.filter(
+      (item) => item.var_group !== variationName
+    );
+    setItemFormData({ ...itemFormData, var_options: filtered });
+  };
+
+  const handleDeleteVariant = ({ variantName, variationGroup }) => {
+    const existingVariations = itemFormData.var_options.filter(
+      (variation) => variation.var_group !== variationGroup.var_group
+    );
+    const filteredVariants = variationGroup.variants.filter(
+      (variant) => variant.var_name !== variantName
+    );
+    const newVariationGroup = { ...variationGroup, variants: filteredVariants };
+
+    const newVariations = [...existingVariations, newVariationGroup].sort(
+      (a, b) => a.var_group.localeCompare(b.var_group)
+    );
+
+    setItemFormData({
+      ...itemFormData,
+      var_options: newVariations,
+    });
+  };
+
   const handleCreateCategory = async () => {
     await addCategory({ categoryName: "main cdourse" });
   };
@@ -227,23 +254,6 @@ const NewItemForm = ({ show, setShow }) => {
             </label>
             <span>Required</span>
           </span>
-          {/* <select
-            name="item-category"
-            id="item-category"
-            className="p-2 border rounded-md w-full"
-            value={itemFormData.category}
-            onChange={(e) =>
-              setItemFormData({ ...itemFormData, category: e.target.value })
-            }
-          >
-            {categoryOptions
-              ? categoryOptions.map((opt, index) => (
-                  <option key={index} value={opt}>
-                    {opt}
-                  </option>
-                ))
-              : {}}
-          </select> */}
           <input
             name="item-category"
             id="item-category"
@@ -265,24 +275,6 @@ const NewItemForm = ({ show, setShow }) => {
                 ))
               : {}}
           </datalist>
-          {/* <p className="text-[0.75rem] ml-1">
-            Missing a category?{" "}
-            <a
-              onClick={handleCreateCategory}
-              className="font-bold text-[var(--primary-color)] cursor-pointer"
-            >
-              Add category
-            </a>
-          </p> */}
-          {/* <p className="text-[0.75rem] ml-1">
-            Missing a category?{" "}
-            <a
-              onClick={handleCreateCategory}
-              className="font-bold text-[var(--primary-color)] cursor-pointer"
-            >
-              Add category
-            </a>
-          </p> */}
         </div>
         <div className="grid gap-2">
           <span className="flex justify-between">
@@ -291,34 +283,7 @@ const NewItemForm = ({ show, setShow }) => {
             </label>
             <span>Optional</span>
           </span>
-          {/* <ul className="">
-            {itemFormData.var_options
-              ? itemFormData.var_options.map((variant, index) => (
-                  <li key={index} className="grid grid-cols-[2fr_1fr_1fr_1fr]">
-                    <label
-                      htmlFor={"var-group-name" + index}
-                      className="inline-flex items-center gap-2"
-                    >
-                      Name
-                      <input
-                        name={"var-group-name" + index}
-                        id={"var-group-name" + index}
-                        type="text"
-                        placeholder="E.g. Size"
-                        value={variant.name}
-                        onChange={(e) =>
-                          setItemFormData({
-                            ...itemFormData,
-                            var_options: [...itemFormData.var_options, {}],
-                          })
-                        }
-                        className="p-2 border rounded-md w-full"
-                      />
-                    </label>
-                  </li>
-                ))
-              : {}}
-          </ul> */}
+
           <div className="grid gap-4">
             {itemFormData.var_options
               ? itemFormData.var_options.map((_variation, index) => (
@@ -328,6 +293,9 @@ const NewItemForm = ({ show, setShow }) => {
                   >
                     <button
                       type="button"
+                      onClick={() =>
+                        handleDeleteVariation(_variation.var_group)
+                      }
                       className="material-symbols-outlined filled text-gray-300 p-2 absolute right-0"
                     >
                       close
@@ -406,6 +374,12 @@ const NewItemForm = ({ show, setShow }) => {
                         </label>
                         <button
                           type="button"
+                          onClick={() =>
+                            handleDeleteVariant({
+                              variantName: _variant.var_name,
+                              variationGroup: _variation,
+                            })
+                          }
                           className="material-symbols-outlined filled text-gray-300 p-2"
                         >
                           close
