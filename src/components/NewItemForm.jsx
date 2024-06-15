@@ -11,18 +11,44 @@ const NewItemForm = ({ show, setShow }) => {
     stock: "",
     available: true,
     description: "",
-    category: "",
+    category: "Unassigned",
     var_options: [],
   });
 
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [variation, setVariation] = useState("");
 
   const handleSubmit = async () => {
     console.log(itemFormData);
     console.log(await getAllCategories());
   };
 
-  const handleAddVariation = () => {};
+  const handleAddVariation = () => {
+    if (variation) {
+      const existVariation = itemFormData.var_options?.filter(
+        (opt) => opt.name === variation
+      );
+      console.log(existVariation);
+      if (existVariation.length <= 0)
+        setItemFormData({
+          ...itemFormData,
+          var_options: [
+            ...itemFormData.var_options,
+            {
+              name: variation,
+              variants: [
+                {
+                  variantName: "",
+                  variantPrice: "",
+                  variantCost: "",
+                },
+              ],
+            },
+          ],
+        });
+    }
+    console.log(itemFormData);
+  };
 
   const handleCreateCategory = async () => {
     await addCategory({ categoryName: "main cdourse" });
@@ -31,6 +57,7 @@ const NewItemForm = ({ show, setShow }) => {
   useEffect(() => {
     const getCategories = async () => {
       setCategoryOptions(await getAllCategories());
+      await addCategory({ categoryName: "Unassigned" });
     };
     getCategories();
   }, []);
@@ -144,7 +171,6 @@ const NewItemForm = ({ show, setShow }) => {
               setItemFormData({ ...itemFormData, category: e.target.value })
             }
           >
-            <option value="">Choose a category</option>
             {categoryOptions
               ? categoryOptions.map((opt, index) => (
                   <option key={index} value={opt}>
@@ -170,6 +196,34 @@ const NewItemForm = ({ show, setShow }) => {
             </label>
             <span>Optional</span>
           </span>
+          <ul className="">
+            {itemFormData.var_options
+              ? itemFormData.var_options.map((variant, index) => (
+                  <li key={index} className="grid grid-cols-[2fr_1fr_1fr_1fr]">
+                    <label
+                      htmlFor={"var-group-name" + index}
+                      className="inline-flex items-center gap-2"
+                    >
+                      Name
+                      <input
+                        name={"var-group-name" + index}
+                        id={"var-group-name" + index}
+                        type="text"
+                        placeholder="E.g. Size"
+                        value={variant.name}
+                        onChange={(e) =>
+                          setItemFormData({
+                            ...itemFormData,
+                            var_options: [...itemFormData.var_options, {}],
+                          })
+                        }
+                        className="p-2 border rounded-md w-full"
+                      />
+                    </label>
+                  </li>
+                ))
+              : {}}
+          </ul>
           <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4">
             <div className="flex items-center gap-2 col-span-2">
               <label htmlFor="var-group-name">Option Name</label>
@@ -178,6 +232,8 @@ const NewItemForm = ({ show, setShow }) => {
                 id="var-group-name"
                 type="text"
                 placeholder="E.g. Size"
+                value={variation}
+                onChange={(e) => setVariation(e.target.value)}
                 className="p-2 border rounded-md w-full"
               />
               <button
