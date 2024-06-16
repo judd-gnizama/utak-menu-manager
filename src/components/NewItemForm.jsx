@@ -73,39 +73,11 @@ const NewItemForm = ({ show, setShow }) => {
   });
 
   const [categoryOptions, setCategoryOptions] = useState([]);
-  const [variation, setVariation] = useState("");
 
   const handleSubmit = async () => {
     console.log(itemFormData);
     console.log(await getAllCategories());
   };
-
-  // const handleAddVariation = () => {
-  //   if (variation) {
-  //     const existVariation = itemFormData.var_options?.filter(
-  //       (opt) => opt.name === variation
-  //     );
-  //     console.log(existVariation);
-  //     if (existVariation.length <= 0)
-  //       setItemFormData({
-  //         ...itemFormData,
-  //         var_options: [
-  //           ...itemFormData.var_options,
-  //           {
-  //             name: variation,
-  //             variants: [
-  //               {
-  //                 variantName: "",
-  //                 variantPrice: "",
-  //                 variantCost: "",
-  //               },
-  //             ],
-  //           },
-  //         ],
-  //       });
-  //   }
-  //   console.log(itemFormData);
-  // };
 
   const handleAddVariation = () => {
     const newVariation = {
@@ -132,6 +104,16 @@ const NewItemForm = ({ show, setShow }) => {
       (item) => item._id !== variationId
     );
     setItemFormData({ ...itemFormData, var_options: filtered });
+  };
+
+  const handleChangeVariationName = (variationId, newVariationName) => {
+    const newVariations = itemFormData.var_options.map((variation) => {
+      if (variation._id === variationId) {
+        variation.var_group = newVariationName;
+      }
+      return variation;
+    });
+    setItemFormData({ ...itemFormData, var_options: newVariations });
   };
 
   const handleAddVariant = (variationGroup) => {
@@ -164,15 +146,12 @@ const NewItemForm = ({ show, setShow }) => {
   };
 
   const handleDeleteVariant = ({ variantId, variationGroup }) => {
-    console.log(variationGroup, "group");
     const existingVariations = itemFormData.var_options.filter(
       (variation) => variation.var_group !== variationGroup.var_group
     );
-    console.log(existingVariations, "existing group");
     const filteredVariants = variationGroup.variants.filter(
       (variant) => variant._id !== variantId
     );
-    console.log(filteredVariants, "filtered variants");
     const newVariationGroup = { ...variationGroup, variants: filteredVariants };
 
     const newVariations = [...existingVariations, newVariationGroup].sort(
@@ -183,6 +162,57 @@ const NewItemForm = ({ show, setShow }) => {
       ...itemFormData,
       var_options: newVariations,
     });
+  };
+
+  const handleChangeVariantName = (variationId, variantId, newVariantName) => {
+    const newVariations = itemFormData.var_options.map((variation) => {
+      if (variation._id === variationId) {
+        const newVariant = variation.variants.map((variant) => {
+          if (variant._id === variantId) {
+            variant.var_name = newVariantName;
+          }
+          return variant;
+        });
+      }
+      return variation;
+    });
+    setItemFormData({ ...itemFormData, var_options: newVariations });
+  };
+  const handleChangeVariantPriceDelta = (
+    variationId,
+    variantId,
+    newVariantPriceDelta
+  ) => {
+    const newVariations = itemFormData.var_options.map((variation) => {
+      if (variation._id === variationId) {
+        const newVariant = variation.variants.map((variant) => {
+          if (variant._id === variantId) {
+            variant.priceDelta = newVariantPriceDelta;
+          }
+          return variant;
+        });
+      }
+      return variation;
+    });
+    setItemFormData({ ...itemFormData, var_options: newVariations });
+  };
+  const handleChangeVariantCostDelta = (
+    variationId,
+    variantId,
+    newVariantCostDelta
+  ) => {
+    const newVariations = itemFormData.var_options.map((variation) => {
+      if (variation._id === variationId) {
+        const newVariant = variation.variants.map((variant) => {
+          if (variant._id === variantId) {
+            variant.costDelta = newVariantCostDelta;
+          }
+          return variant;
+        });
+      }
+      return variation;
+    });
+    setItemFormData({ ...itemFormData, var_options: newVariations });
   };
 
   const handleCreateCategory = async () => {
@@ -351,6 +381,12 @@ const NewItemForm = ({ show, setShow }) => {
                         type="text"
                         placeholder="E.g. Size"
                         value={_variation.var_group}
+                        onChange={(e) =>
+                          handleChangeVariationName(
+                            _variation._id,
+                            e.target.value
+                          )
+                        }
                         className="p-2 border rounded-md w-full"
                       />
                     </div>
@@ -365,6 +401,13 @@ const NewItemForm = ({ show, setShow }) => {
                             id={"variant-name" + _variant.var_name}
                             placeholder={"Variant " + (index + 1)}
                             value={_variant.var_name}
+                            onChange={(e) =>
+                              handleChangeVariantName(
+                                _variation._id,
+                                _variant._id,
+                                e.target.value
+                              )
+                            }
                             className="p-2 border rounded-md w-full"
                           />
                         </div>
@@ -381,6 +424,13 @@ const NewItemForm = ({ show, setShow }) => {
                             type="number"
                             min="0"
                             value={_variant.priceDelta}
+                            onChange={(e) =>
+                              handleChangeVariantPriceDelta(
+                                _variation._id,
+                                _variant._id,
+                                e.target.value
+                              )
+                            }
                             className="p-2 border rounded-md w-full"
                           />
                         </div>
@@ -397,6 +447,13 @@ const NewItemForm = ({ show, setShow }) => {
                             type="number"
                             min="0"
                             value={_variant.costDelta}
+                            onChange={(e) =>
+                              handleChangeVariantCostDelta(
+                                _variation._id,
+                                _variant._id,
+                                e.target.value
+                              )
+                            }
                             className="p-2 border rounded-md w-full"
                           />
                         </div>
@@ -427,72 +484,7 @@ const NewItemForm = ({ show, setShow }) => {
                         </button>
                       </div>
                     ))}
-                    {/* <div className="flex gap-3 col-start-1 ml-8 col-span-full ">
-                      <div className="flex items-center gap-1">
-                        <input
-                          name="item-cost"
-                          id="item-cost"
-                          placeholder="Variant 2"
-                          className="p-2 border rounded-md w-full"
-                        />
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <label htmlFor="item-stock" className="text-nowrap">
-                          Price Adj
-                        </label>
-                        <input
-                          name="item-stock"
-                          id="item-stock"
-                          type="number"
-                          min="0"
-                          value={itemFormData.stock}
-                          onChange={(e) =>
-                            setItemFormData({
-                              ...itemFormData,
-                              stock: e.target.value,
-                            })
-                          }
-                          className="p-2 border rounded-md w-full"
-                        />
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <label htmlFor="item-stock" className="text-nowrap">
-                          Cost Adj
-                        </label>
-                        <input
-                          name="item-stock"
-                          id="item-stock"
-                          type="number"
-                          min="0"
-                          value={itemFormData.stock}
-                          onChange={(e) =>
-                            setItemFormData({
-                              ...itemFormData,
-                              stock: e.target.value,
-                            })
-                          }
-                          className="p-2 border rounded-md w-full"
-                        />
-                      </div>
-                      <label
-                        htmlFor="availability"
-                        className="inline-flex items-center gap-2 font-bold"
-                      >
-                        <input
-                          type="checkbox"
-                          name="availability"
-                          id="availability"
-                          className="ml-2 scale-110"
-                        />
-                        Available
-                      </label>
-                      <button
-                        type="button"
-                        className="material-symbols-outlined filled text-gray-300 p-2"
-                      >
-                        delete
-                      </button>
-                    </div> */}
+
                     <button
                       type="button"
                       onClick={() => handleAddVariant(_variation)}
