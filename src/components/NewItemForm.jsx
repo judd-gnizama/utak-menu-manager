@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import FormModal from "./FormModal";
 import { addItem, getAllItems } from "../firebase/ItemController";
 import { addCategory, getAllCategories } from "../firebase/CategoryController";
+import { getRandomString } from "../firebase/AuxFunctions";
 
 const NewItemForm = ({ show, setShow }) => {
   const [itemFormData, setItemFormData] = useState({
@@ -14,21 +15,26 @@ const NewItemForm = ({ show, setShow }) => {
     category: "",
     var_options: [
       {
+        _id: getRandomString(),
         var_group: "Size",
         variants: [
           {
+            _id: getRandomString(),
             var_name: "Small",
             priceDelta: 0,
             costDelta: 0,
             available: true,
           },
           {
+            _id: getRandomString(),
             var_name: "Medium",
             priceDelta: 500,
             costDelta: -200,
             available: true,
           },
           {
+            _id: getRandomString(),
+            _id: getRandomString(),
             var_name: "Large",
             priceDelta: -800,
             costDelta: 300,
@@ -37,21 +43,25 @@ const NewItemForm = ({ show, setShow }) => {
         ],
       },
       {
+        _id: getRandomString(),
         var_group: "Toppings",
         variants: [
           {
+            _id: getRandomString(),
             var_name: "Pepperoni",
             priceDelta: 120,
             costDelta: 20,
             available: true,
           },
           {
+            _id: getRandomString(),
             var_name: "Ham",
             priceDelta: 300,
             costDelta: 100,
             available: true,
           },
           {
+            _id: getRandomString(),
             var_name: "Cheese",
             priceDelta: 400,
             costDelta: 200,
@@ -99,6 +109,7 @@ const NewItemForm = ({ show, setShow }) => {
 
   const handleAddVariation = () => {
     const newVariation = {
+      _id: getRandomString(),
       var_group: "",
       variants: [
         {
@@ -115,21 +126,53 @@ const NewItemForm = ({ show, setShow }) => {
     });
   };
 
-  const handleDeleteVariation = (variationName) => {
+  const handleDeleteVariation = (variationId) => {
     const existingVariations = itemFormData.var_options;
     const filtered = existingVariations.filter(
-      (item) => item.var_group !== variationName
+      (item) => item._id !== variationId
     );
     setItemFormData({ ...itemFormData, var_options: filtered });
   };
 
-  const handleDeleteVariant = ({ variantName, variationGroup }) => {
+  const handleAddVariant = (variationGroup) => {
     const existingVariations = itemFormData.var_options.filter(
       (variation) => variation.var_group !== variationGroup.var_group
     );
-    const filteredVariants = variationGroup.variants.filter(
-      (variant) => variant.var_name !== variantName
+
+    const newVariationGroup = {
+      ...variationGroup,
+      variants: [
+        ...variationGroup.variants,
+        {
+          _id: getRandomString(),
+          var_name: "",
+          priceDelta: "",
+          costDelta: "",
+          available: true,
+        },
+      ],
+    };
+
+    const newVariations = [...existingVariations, newVariationGroup].sort(
+      (a, b) => a.var_group.localeCompare(b.var_group)
     );
+
+    setItemFormData({
+      ...itemFormData,
+      var_options: newVariations,
+    });
+  };
+
+  const handleDeleteVariant = ({ variantId, variationGroup }) => {
+    console.log(variationGroup, "group");
+    const existingVariations = itemFormData.var_options.filter(
+      (variation) => variation.var_group !== variationGroup.var_group
+    );
+    console.log(existingVariations, "existing group");
+    const filteredVariants = variationGroup.variants.filter(
+      (variant) => variant._id !== variantId
+    );
+    console.log(filteredVariants, "filtered variants");
     const newVariationGroup = { ...variationGroup, variants: filteredVariants };
 
     const newVariations = [...existingVariations, newVariationGroup].sort(
@@ -293,9 +336,7 @@ const NewItemForm = ({ show, setShow }) => {
                   >
                     <button
                       type="button"
-                      onClick={() =>
-                        handleDeleteVariation(_variation.var_group)
-                      }
+                      onClick={() => handleDeleteVariation(_variation._id)}
                       className="material-symbols-outlined filled text-gray-300 p-2 absolute right-0"
                     >
                       close
@@ -376,7 +417,7 @@ const NewItemForm = ({ show, setShow }) => {
                           type="button"
                           onClick={() =>
                             handleDeleteVariant({
-                              variantName: _variant.var_name,
+                              variantId: _variant._id,
                               variationGroup: _variation,
                             })
                           }
@@ -454,6 +495,7 @@ const NewItemForm = ({ show, setShow }) => {
                     </div> */}
                     <button
                       type="button"
+                      onClick={() => handleAddVariant(_variation)}
                       className="inline-flex items-center justify-center border rounded-md ml-8 col-span-full"
                     >
                       <span className="material-symbols-outlined">

@@ -16,20 +16,23 @@ const addItem = () => {
     var_options: [
       {
         var_group: "Size",
-        variations: [
+        variants: [
           {
+            _id: "112411",
             var_name: "Small",
             priceDelta: 0,
             costDelta: 0,
             available: true,
           },
           {
+            _id: "1geg11",
             var_name: "Medium",
             priceDelta: 500,
             costDelta: 200,
             available: true,
           },
           {
+            _id: "14561",
             var_name: "Large",
             priceDelta: 800,
             costDelta: 300,
@@ -39,20 +42,23 @@ const addItem = () => {
       },
       {
         var_group: "Toppings",
-        variations: [
+        variants: [
           {
+            _id: "13232",
             var_name: "Pepperoni",
             priceDelta: 120,
             costDelta: 20,
             available: true,
           },
           {
+            _id: "323yg1",
             var_name: "Ham",
             priceDelta: 300,
             costDelta: 100,
             available: true,
           },
           {
+            _id: "11ghber",
             var_name: "Cheese",
             priceDelta: 400,
             costDelta: 200,
