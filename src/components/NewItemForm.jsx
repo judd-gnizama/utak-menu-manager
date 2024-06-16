@@ -85,6 +85,7 @@ const NewItemForm = ({ show, setShow }) => {
       var_group: "",
       variants: [
         {
+          _id: getRandomString(),
           var_name: "",
           priceDelta: "",
           costDelta: "",
@@ -118,7 +119,7 @@ const NewItemForm = ({ show, setShow }) => {
 
   const handleAddVariant = (variationGroup) => {
     const existingVariations = itemFormData.var_options.filter(
-      (variation) => variation.var_group !== variationGroup.var_group
+      (variation) => variation._id !== variationGroup._id
     );
 
     const newVariationGroup = {
@@ -135,9 +136,7 @@ const NewItemForm = ({ show, setShow }) => {
       ],
     };
 
-    const newVariations = [...existingVariations, newVariationGroup].sort(
-      (a, b) => a.var_group.localeCompare(b.var_group)
-    );
+    const newVariations = [...existingVariations, newVariationGroup];
 
     setItemFormData({
       ...itemFormData,
@@ -145,18 +144,29 @@ const NewItemForm = ({ show, setShow }) => {
     });
   };
 
-  const handleDeleteVariant = ({ variantId, variationGroup }) => {
-    const existingVariations = itemFormData.var_options.filter(
-      (variation) => variation.var_group !== variationGroup.var_group
-    );
-    const filteredVariants = variationGroup.variants.filter(
-      (variant) => variant._id !== variantId
-    );
-    const newVariationGroup = { ...variationGroup, variants: filteredVariants };
+  const handleDeleteVariant = ({ variantId, variationId }) => {
+    // const existingVariations = itemFormData.var_options.filter(
+    //   (variation) => variation._id !== variationGroup._id
+    // );
+    // const filteredVariants = variationGroup.variants.filter(
+    //   (variant) => variant._id !== variantId
+    // );
 
-    const newVariations = [...existingVariations, newVariationGroup].sort(
-      (a, b) => a.var_group.localeCompare(b.var_group)
-    );
+    // const newVariationGroup = { ...variationGroup, variants: filteredVariants };
+
+    // const newVariations = [...existingVariations, newVariationGroup].sort(
+    //   (a, b) => a.var_group.localeCompare(b.var_group)
+    // );
+
+    const newVariations = itemFormData.var_options.map((variation) => {
+      if (variation._id === variationId) {
+        const newVariants = variation.variants.filter(
+          (variant) => variant._id !== variantId
+        );
+        variation.variants = newVariants;
+      }
+      return variation;
+    });
 
     setItemFormData({
       ...itemFormData,
@@ -212,6 +222,25 @@ const NewItemForm = ({ show, setShow }) => {
       }
       return variation;
     });
+    setItemFormData({ ...itemFormData, var_options: newVariations });
+  };
+  const handleChangeVariantAvailable = (
+    variationId,
+    variantId,
+    newVariantAvailable
+  ) => {
+    const newVariations = itemFormData.var_options.map((variation) => {
+      if (variation._id === variationId) {
+        const newVariant = variation.variants.map((variant) => {
+          if (variant._id === variantId) {
+            variant.available = newVariantAvailable;
+          }
+          return variant;
+        });
+      }
+      return variation;
+    });
+    console.log(itemFormData);
     setItemFormData({ ...itemFormData, var_options: newVariations });
   };
 
@@ -372,12 +401,15 @@ const NewItemForm = ({ show, setShow }) => {
                       close
                     </button>
                     <div className="flex items-center gap-2 col-span-2">
-                      <label htmlFor="var-group-name" className="text-nowrap">
+                      <label
+                        htmlFor={"var-group-name" + _variation._id}
+                        className="text-nowrap"
+                      >
                         Variation Name
                       </label>
                       <input
-                        name="var-group-name"
-                        id="var-group-name"
+                        name={"var-group-name" + _variation._id}
+                        id={"var-group-name" + _variation._id}
                         type="text"
                         placeholder="E.g. Size"
                         value={_variation.var_group}
@@ -397,8 +429,8 @@ const NewItemForm = ({ show, setShow }) => {
                       >
                         <div className="flex items-center gap-1">
                           <input
-                            name={"variant-name" + _variant.var_name}
-                            id={"variant-name" + _variant.var_name}
+                            name={"variant-name" + _variant._id}
+                            id={"variant-name" + _variant._id}
                             placeholder={"Variant " + (index + 1)}
                             value={_variant.var_name}
                             onChange={(e) =>
@@ -413,14 +445,14 @@ const NewItemForm = ({ show, setShow }) => {
                         </div>
                         <div className="flex items-center gap-1">
                           <label
-                            htmlFor={"variant-priceAdj" + _variant.var_name}
+                            htmlFor={"variant-priceAdj" + _variant._id}
                             className="text-nowrap"
                           >
                             Price Adj
                           </label>
                           <input
-                            name={"variant-priceAdj" + _variant.var_name}
-                            id={"variant-priceAdj" + _variant.var_name}
+                            name={"variant-priceAdj" + _variant._id}
+                            id={"variant-priceAdj" + _variant._id}
                             type="number"
                             min="0"
                             value={_variant.priceDelta}
@@ -436,14 +468,14 @@ const NewItemForm = ({ show, setShow }) => {
                         </div>
                         <div className="flex items-center gap-1">
                           <label
-                            htmlFor={"variant-costAdj" + _variant.var_name}
+                            htmlFor={"variant-costAdj" + _variant._id}
                             className="text-nowrap"
                           >
                             Cost Adj
                           </label>
                           <input
-                            name={"variant-costAdj" + _variant.var_name}
-                            id={"variant-costAdj" + _variant.var_name}
+                            name={"variant-costAdj" + _variant._id}
+                            id={"variant-costAdj" + _variant._id}
                             type="number"
                             min="0"
                             value={_variant.costDelta}
@@ -459,14 +491,21 @@ const NewItemForm = ({ show, setShow }) => {
                         </div>
 
                         <label
-                          htmlFor={"variant-availability" + _variant.var_name}
+                          htmlFor={"variant-availability" + _variant._id}
                           className="inline-flex items-center gap-1 font-bold"
                         >
                           <input
                             type="checkbox"
-                            name={"variant-availability" + _variant.var_name}
-                            id={"variant-availability" + _variant.var_name}
+                            name={"variant-availability" + _variant._id}
+                            id={"variant-availability" + _variant._id}
                             checked={_variant.available}
+                            onChange={(e) =>
+                              handleChangeVariantAvailable(
+                                _variation._id,
+                                _variant._id,
+                                e.target.checked
+                              )
+                            }
                           />
                           Available
                         </label>
@@ -475,7 +514,7 @@ const NewItemForm = ({ show, setShow }) => {
                           onClick={() =>
                             handleDeleteVariant({
                               variantId: _variant._id,
-                              variationGroup: _variation,
+                              variationId: _variation._id,
                             })
                           }
                           className="material-symbols-outlined filled text-gray-300 p-2"
