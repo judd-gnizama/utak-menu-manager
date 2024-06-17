@@ -9,11 +9,13 @@ const FormModal = ({ heading, children, show, setShow }) => {
       onClick={() => setShow(false)}
     >
       <div
-        className="grid grid-rows-[auto_1fr] bg-white rounded-lg p-6 max-w-2xl h-full max-h-[75%] overflow-y-hidden"
+        className="grid grid-rows-[auto_1fr] bg-white rounded-lg p-6 max-w-2xl h-full max-h-[80%] overflow-y-hidden"
         onClick={(e) => e.stopPropagation()} // stop from exiting
       >
         <FormModalHeader heading={heading} setShow={setShow} />
-        <div className=" overflow-auto">{children}</div>
+        <div className=" overflow-auto last:sticky last:bottom-0">
+          {children}
+        </div>
       </div>
     </div>
   );

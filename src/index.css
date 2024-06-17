@@ -4,7 +4,7 @@
 
 :root {
   --primary-color: rgba(4, 142, 144, 1);
-  --primary-color-light: rgba(246, 252, 251, 1);
+  --primary-color-light: rgb(66, 223, 196);
   --secondary-color: rgba(220, 124, 85, 1);
 
   --neutral-offwhite: rgba(245, 245, 245, 1);

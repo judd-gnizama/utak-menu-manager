@@ -3,6 +3,7 @@ import FormModal from "./FormModal";
 import { addItem, getAllItems } from "../firebase/ItemController";
 import { addCategory, getAllCategories } from "../firebase/CategoryController";
 import { getRandomString } from "../firebase/AuxFunctions";
+import ChipInput from "./ChipInput";
 
 const NewItemForm = ({ show, setShow }) => {
   const [itemFormData, setItemFormData] = useState({
@@ -12,7 +13,7 @@ const NewItemForm = ({ show, setShow }) => {
     stock: "",
     available: true,
     description: "",
-    category: "",
+    categories: [],
     var_options: [
       {
         _id: getRandomString(),
@@ -74,9 +75,9 @@ const NewItemForm = ({ show, setShow }) => {
 
   const [categoryOptions, setCategoryOptions] = useState([]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     console.log(itemFormData);
-    console.log(await getAllCategories());
   };
 
   const handleAddVariation = () => {
@@ -117,26 +118,22 @@ const NewItemForm = ({ show, setShow }) => {
     setItemFormData({ ...itemFormData, var_options: newVariations });
   };
 
-  const handleAddVariant = (variationGroup) => {
-    const existingVariations = itemFormData.var_options.filter(
-      (variation) => variation._id !== variationGroup._id
-    );
-
-    const newVariationGroup = {
-      ...variationGroup,
-      variants: [
-        ...variationGroup.variants,
-        {
-          _id: getRandomString(),
-          var_name: "",
-          priceDelta: "",
-          costDelta: "",
-          available: true,
-        },
-      ],
-    };
-
-    const newVariations = [...existingVariations, newVariationGroup];
+  const handleAddVariant = (variationId) => {
+    const newVariations = itemFormData.var_options.map((variation) => {
+      if (variation._id === variationId) {
+        variation.variants = [
+          ...variation.variants,
+          {
+            _id: getRandomString(),
+            var_name: "",
+            priceDelta: "",
+            costDelta: "",
+            available: true,
+          },
+        ];
+      }
+      return variation;
+    });
 
     setItemFormData({
       ...itemFormData,
@@ -145,19 +142,6 @@ const NewItemForm = ({ show, setShow }) => {
   };
 
   const handleDeleteVariant = ({ variantId, variationId }) => {
-    // const existingVariations = itemFormData.var_options.filter(
-    //   (variation) => variation._id !== variationGroup._id
-    // );
-    // const filteredVariants = variationGroup.variants.filter(
-    //   (variant) => variant._id !== variantId
-    // );
-
-    // const newVariationGroup = { ...variationGroup, variants: filteredVariants };
-
-    // const newVariations = [...existingVariations, newVariationGroup].sort(
-    //   (a, b) => a.var_group.localeCompare(b.var_group)
-    // );
-
     const newVariations = itemFormData.var_options.map((variation) => {
       if (variation._id === variationId) {
         const newVariants = variation.variants.filter(
@@ -195,12 +179,13 @@ const NewItemForm = ({ show, setShow }) => {
   ) => {
     const newVariations = itemFormData.var_options.map((variation) => {
       if (variation._id === variationId) {
-        const newVariant = variation.variants.map((variant) => {
+        const newVariants = variation.variants.map((variant) => {
           if (variant._id === variantId) {
             variant.priceDelta = newVariantPriceDelta;
           }
           return variant;
         });
+        variation.variants = newVariants;
       }
       return variation;
     });
@@ -213,12 +198,13 @@ const NewItemForm = ({ show, setShow }) => {
   ) => {
     const newVariations = itemFormData.var_options.map((variation) => {
       if (variation._id === variationId) {
-        const newVariant = variation.variants.map((variant) => {
+        const newVariants = variation.variants.map((variant) => {
           if (variant._id === variantId) {
             variant.costDelta = newVariantCostDelta;
           }
           return variant;
         });
+        variation.variants = newVariants;
       }
       return variation;
     });
@@ -231,21 +217,22 @@ const NewItemForm = ({ show, setShow }) => {
   ) => {
     const newVariations = itemFormData.var_options.map((variation) => {
       if (variation._id === variationId) {
-        const newVariant = variation.variants.map((variant) => {
+        const newVariants = variation.variants.map((variant) => {
           if (variant._id === variantId) {
             variant.available = newVariantAvailable;
           }
           return variant;
         });
+        variation.variants = newVariants;
       }
       return variation;
     });
-    console.log(itemFormData);
     setItemFormData({ ...itemFormData, var_options: newVariations });
   };
 
-  const handleCreateCategory = async () => {
-    await addCategory({ categoryName: "main cdourse" });
+  const handleChangeCategory = (categories) => {
+    console.log(categories);
+    setItemFormData({ ...itemFormData, categories });
   };
 
   useEffect(() => {
@@ -256,9 +243,13 @@ const NewItemForm = ({ show, setShow }) => {
     getCategories();
   }, []);
 
+  // useEffect(() => {
+  //   console.log(itemFormData);
+  // }, [itemFormData]);
+
   return (
     <FormModal heading={"New Item"} show={show} setShow={setShow}>
-      <form action="" className="grid text-sm gap-6 mt-4 pr-2">
+      <form className="grid text-sm gap-6 mt-4 pr-2 pb-4">
         <div className="grid gap-2">
           <span className="flex justify-between">
             <label htmlFor="item-name" className="font-bold">
@@ -279,12 +270,15 @@ const NewItemForm = ({ show, setShow }) => {
           />
           <div className="grid grid-cols-3 gap-4">
             <div className="flex items-center gap-2">
-              <label htmlFor="item-price">Base Price</label>
+              <label htmlFor="item-price" className="text-nowrap">
+                Base Price
+              </label>
               <input
                 name="item-price"
                 id="item-price"
                 type="number"
                 min="0"
+                step="0.01"
                 value={itemFormData.price}
                 onChange={(e) =>
                   setItemFormData({
@@ -296,12 +290,15 @@ const NewItemForm = ({ show, setShow }) => {
               />
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="item-cost">Base Cost</label>
+              <label htmlFor="item-cost" className="text-nowrap">
+                Base Cost
+              </label>
               <input
                 name="item-cost"
                 id="item-cost"
                 type="number"
                 min="0"
+                step="0.01"
                 value={itemFormData.cost}
                 onChange={(e) =>
                   setItemFormData({
@@ -319,6 +316,7 @@ const NewItemForm = ({ show, setShow }) => {
                 id="item-stock"
                 type="number"
                 min="0"
+                step="0.01"
                 value={itemFormData.stock}
                 onChange={(e) =>
                   setItemFormData({
@@ -356,17 +354,9 @@ const NewItemForm = ({ show, setShow }) => {
             </label>
             <span>Required</span>
           </span>
-          <input
-            name="item-category"
-            id="item-category"
-            type="text"
-            list="category-list"
-            value={itemFormData.category}
-            onChange={(e) =>
-              setItemFormData({ ...itemFormData, category: e.target.value })
-            }
-            placeholder="Create or Search Category"
-            className="p-2 border rounded-md w-full"
+          <ChipInput
+            placeholder={"Press Enter to Add Category"}
+            setParameter={handleChangeCategory}
           />
           <datalist id="category-list">
             {categoryOptions
@@ -378,6 +368,7 @@ const NewItemForm = ({ show, setShow }) => {
               : {}}
           </datalist>
         </div>
+
         <div className="grid gap-2">
           <span className="flex justify-between">
             <label htmlFor="item-name" className="font-bold">
@@ -454,7 +445,6 @@ const NewItemForm = ({ show, setShow }) => {
                             name={"variant-priceAdj" + _variant._id}
                             id={"variant-priceAdj" + _variant._id}
                             type="number"
-                            min="0"
                             value={_variant.priceDelta}
                             onChange={(e) =>
                               handleChangeVariantPriceDelta(
@@ -477,7 +467,6 @@ const NewItemForm = ({ show, setShow }) => {
                             name={"variant-costAdj" + _variant._id}
                             id={"variant-costAdj" + _variant._id}
                             type="number"
-                            min="0"
                             value={_variant.costDelta}
                             onChange={(e) =>
                               handleChangeVariantCostDelta(
@@ -526,8 +515,8 @@ const NewItemForm = ({ show, setShow }) => {
 
                     <button
                       type="button"
-                      onClick={() => handleAddVariant(_variation)}
-                      className="inline-flex items-center justify-center border rounded-md ml-8 col-span-full"
+                      onClick={() => handleAddVariant(_variation._id)}
+                      className="inline-flex items-center justify-center border rounded-md ml-8 col-span-full p-0.5"
                     >
                       <span className="material-symbols-outlined">
                         keyboard_return
@@ -540,11 +529,11 @@ const NewItemForm = ({ show, setShow }) => {
 
             <button
               type="button"
-              className="inline-flex items-center justify-center border rounded-md"
+              className="inline-flex items-center justify-center border rounded-md p-0.5"
               onClick={handleAddVariation}
             >
-              <span className="material-symbols-outlined">add</span>Add New
-              Variation
+              <span className="material-symbols-outlined ">add</span>
+              Add New Variation
             </button>
           </div>
         </div>
@@ -576,7 +565,11 @@ const NewItemForm = ({ show, setShow }) => {
             >
               Create Item
             </button>
-            <button type="button" className="button-2 py-3">
+            <button
+              type="button"
+              onClick={() => setShow(false)}
+              className="button-2 py-3"
+            >
               Cancel
             </button>
           </div>
