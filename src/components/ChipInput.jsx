@@ -22,13 +22,19 @@ const ChipInput = ({ placeholder, setParameter }) => {
   };
 
   const handleChange = (event) => {
-    const _input = event.target.value.trim();
+    const _input = event.target.value;
     setInputCategory(_input);
+    setError("");
   };
 
   const handleRemoveChip = (event, chipName) => {
     const newChips = chips.filter((chip) => chip !== chipName);
     setChips(newChips);
+  };
+
+  const handleRemoveAll = () => {
+    setChips([]);
+    setError("");
   };
 
   return (
@@ -57,7 +63,7 @@ const ChipInput = ({ placeholder, setParameter }) => {
             name="category-chip"
             id="category-chip"
             list="category-list"
-            placeholder={placeholder}
+            // placeholder={placeholder}
             value={inputCategory}
             onChange={handleChange}
             onKeyUp={handleKeyUp}
@@ -68,7 +74,7 @@ const ChipInput = ({ placeholder, setParameter }) => {
       <div className="flex justify-between">
         <span className="text-red-400 text-[0.8rem]">{error}</span>
         <button
-          onClick={() => setChips([])}
+          onClick={handleRemoveAll}
           type="button"
           className="font-bold text-[var(--primary-color)]"
         >

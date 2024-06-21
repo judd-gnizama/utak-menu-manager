@@ -1,83 +1,61 @@
 import React, { useEffect, useState } from "react";
 import FormModal from "./FormModal";
-import { addItem, getAllItems } from "../firebase/ItemController";
 import { addCategory, getAllCategories } from "../firebase/CategoryController";
 import { getRandomString } from "../firebase/AuxFunctions";
 import ChipInput from "./ChipInput";
+import { addItem } from "../firebase/ItemController";
 
 const NewItemForm = ({ show, setShow }) => {
   const [itemFormData, setItemFormData] = useState({
     name: "",
-    price: "",
-    cost: "",
-    stock: "",
+    price: 0,
+    cost: 0,
+    stock: 0,
     available: true,
     description: "",
     categories: [],
-    var_options: [
-      {
-        _id: getRandomString(),
-        var_group: "Size",
-        variants: [
-          {
-            _id: getRandomString(),
-            var_name: "Small",
-            priceDelta: 0,
-            costDelta: 0,
-            available: true,
-          },
-          {
-            _id: getRandomString(),
-            var_name: "Medium",
-            priceDelta: 500,
-            costDelta: -200,
-            available: true,
-          },
-          {
-            _id: getRandomString(),
-            _id: getRandomString(),
-            var_name: "Large",
-            priceDelta: -800,
-            costDelta: 300,
-            available: true,
-          },
-        ],
-      },
-      {
-        _id: getRandomString(),
-        var_group: "Toppings",
-        variants: [
-          {
-            _id: getRandomString(),
-            var_name: "Pepperoni",
-            priceDelta: 120,
-            costDelta: 20,
-            available: true,
-          },
-          {
-            _id: getRandomString(),
-            var_name: "Ham",
-            priceDelta: 300,
-            costDelta: 100,
-            available: true,
-          },
-          {
-            _id: getRandomString(),
-            var_name: "Cheese",
-            priceDelta: 400,
-            costDelta: 200,
-            available: true,
-          },
-        ],
-      },
-    ],
+    var_options: [],
   });
 
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [error, setError] = useState("");
+
+  const handleErrors = () => {
+    const {
+      name,
+      price,
+      cost,
+      stock,
+      available,
+      description,
+      categories,
+      var_options,
+    } = itemFormData;
+
+    let errors = [];
+
+    if (!name) errors.push("Missing Item Name");
+    if (price === null) errors.push("Missing Base Price");
+    if (price < 0) errors.push("Incorrect Base Price");
+    if (!cost) errors.push("Missing Base Cost");
+    if (cost < 0) errors.push("Incorrect Base Cost");
+    if (!stock) errors.push("Missing Stock");
+    if (stock < 0) errors.push("Incorrect Stock");
+
+    if (errors.length > 0) {
+      let errorString = "";
+      errors.forEach((err) => {
+        errorString = errorString + "\n" + err;
+      });
+      setError(errorString);
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(itemFormData);
+    try {
+      await addItem({ itemData: itemFormData });
+    } catch (error) {}
   };
 
   const handleAddVariation = () => {
@@ -88,8 +66,8 @@ const NewItemForm = ({ show, setShow }) => {
         {
           _id: getRandomString(),
           var_name: "",
-          priceDelta: "",
-          costDelta: "",
+          priceDelta: 0,
+          costDelta: 0,
           available: true,
         },
       ],
@@ -126,8 +104,8 @@ const NewItemForm = ({ show, setShow }) => {
           {
             _id: getRandomString(),
             var_name: "",
-            priceDelta: "",
-            costDelta: "",
+            priceDelta: 0,
+            costDelta: 0,
             available: true,
           },
         ];
@@ -231,7 +209,6 @@ const NewItemForm = ({ show, setShow }) => {
   };
 
   const handleChangeCategory = (categories) => {
-    console.log(categories);
     setItemFormData({ ...itemFormData, categories });
   };
 
@@ -242,10 +219,6 @@ const NewItemForm = ({ show, setShow }) => {
     };
     getCategories();
   }, []);
-
-  // useEffect(() => {
-  //   console.log(itemFormData);
-  // }, [itemFormData]);
 
   return (
     <FormModal heading={"New Item"} show={show} setShow={setShow}>
@@ -349,9 +322,7 @@ const NewItemForm = ({ show, setShow }) => {
         </div>
         <div className="grid gap-2">
           <span className="flex justify-between">
-            <label htmlFor="item-name" className="font-bold">
-              Set Category
-            </label>
+            <label className="font-bold">Set Category</label>
             <span>Required</span>
           </span>
           <ChipInput
@@ -371,9 +342,7 @@ const NewItemForm = ({ show, setShow }) => {
 
         <div className="grid gap-2">
           <span className="flex justify-between">
-            <label htmlFor="item-name" className="font-bold">
-              Variations Options
-            </label>
+            <label className="font-bold">Variations Options</label>
             <span>Optional</span>
           </span>
 
@@ -537,6 +506,10 @@ const NewItemForm = ({ show, setShow }) => {
             </button>
           </div>
         </div>
+        {error && (
+          <span className="bg-red-400 text-white p-4 rounded-lg">{`Error: ${error}`}</span>
+        )}
+
         <div className="flex justify-between gap-2">
           <label
             htmlFor="availability"
